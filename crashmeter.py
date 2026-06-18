@@ -10,7 +10,8 @@ FRED_KEY = os.environ.get("FRED_API_KEY", "")
 FRED = "https://api.stlouisfed.org/fred/series/observations"
 
 # ---------- Konfigurasi (sesuaikan sendiri) ----------
-TIER2_WINDOW_END   = datetime.date(2027, 4, 30)  # window lag yield curve (legacy A)
+LAST_INVERSION_END = datetime.date(2024, 12, 1)  # tanggal terakhir T10Y-3M inverted
+TIER2_LAG_MONTHS   = 18                            # lag historis (midpoint 12-24 bln)
 CAPE_FALLBACK      = 42.5                          # dipakai bila scrape Multpl gagal
 SURGE_THRESHOLD_BPS = 150                          # B1: kenaikan HY OAS 6 bln
 LEVEL_THRESHOLD_BPS = 550                          # B2: level HY OAS
@@ -60,7 +61,10 @@ yc = fred("T10Y3M")
 yc_date, yc_spread = yc[0]
 yc_bps = yc_spread * 100
 tier1 = yc_spread < 0
+_m = LAST_INVERSION_END.month - 1 + TIER2_LAG_MONTHS
+TIER2_WINDOW_END = datetime.date(LAST_INVERSION_END.year + _m // 12, _m % 12 + 1, 1)
 tier2 = today <= TIER2_WINDOW_END
+
 A = 1 if (tier1 or tier2) else 0
 
 # B — HY OAS
