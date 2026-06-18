@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crashmeter — S&amp;P 500</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0E1116; --panel:#161B22; --line:#232A33;
+    --ink:#E6EDF3; --muted:#8B949E; --faint:#5A636E;
+    --calm:#2EA043; --watch:#D29922; --exit:#F85149;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,-apple-system,Segoe UI,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:var(--disp); line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    display:flex; justify-content:center; padding:clamp(20px,5vw,64px) 18px;
+  }
+  .wrap{width:100%; max-width:640px}
+
+  .eyebrow{
+    font-family:var(--mono); font-size:12px; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--muted); margin:0 0 22px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--accent,var(--watch))}
+
+  /* hero */
+  .hero{
+    display:flex; align-items:flex-end; gap:clamp(18px,5vw,40px);
+    padding-bottom:26px; border-bottom:1px solid var(--line);
+  }
+  .score{
+    font-family:var(--mono); font-weight:700;
+    font-size:clamp(76px,20vw,128px); line-height:.82;
+    color:var(--accent,var(--watch)); letter-spacing:-.03em;
+  }
+  .score span{color:var(--faint); font-size:.42em; font-weight:500}
+  .herometa{padding-bottom:8px}
+  .zone{
+    font-family:var(--mono); font-weight:700; font-size:15px;
+    letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent,var(--watch));
+  }
+  .segbar{display:flex; gap:6px; margin-top:12px}
+  .seg{height:9px; width:30px; border-radius:2px;
+       background:var(--line); transition:background .3s}
+  .seg.on{background:var(--accent,var(--watch))}
+
+  /* table */
+  .rows{margin:26px 0 0}
+  .row{
+    display:grid; grid-template-columns:34px 1fr auto;
+    align-items:center; gap:14px;
+    padding:15px 0; border-bottom:1px solid var(--line);
+  }
+  .tag{
+    font-family:var(--mono); font-weight:700; font-size:13px;
+    color:var(--muted); text-align:left;
+  }
+  .label{font-size:15px; font-weight:500}
+  .reading{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-top:2px}
+  .stat{
+    font-family:var(--mono); font-size:11px; font-weight:500;
+    letter-spacing:.1em; text-transform:uppercase;
+    display:flex; align-items:center; gap:7px; color:var(--faint);
+    white-space:nowrap;
+  }
+  .stat .led{width:8px;height:8px;border-radius:50%;
+    border:1.5px solid var(--faint); background:transparent}
+  .row.on .stat{color:var(--accent,var(--watch))}
+  .row.on .stat .led{background:var(--accent,var(--watch));border-color:var(--accent,var(--watch))}
+
+  /* footer */
+  .foot{margin-top:26px; font-family:var(--mono); font-size:11.5px;
+        color:var(--faint); line-height:1.7}
+  .foot .exit{color:var(--muted)}
+  .foot a{color:var(--muted); text-decoration:none; border-bottom:1px solid var(--line)}
+  .disc{margin-top:14px; padding-top:14px; border-top:1px solid var(--line)}
+
+  .err{font-family:var(--mono); font-size:13px; color:var(--exit)}
+
+  @media (max-width:430px){
+    .hero{flex-direction:column; align-items:flex-start; gap:14px}
+    .seg{width:100%}
+    .segbar{width:100%}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+  <main class="wrap" id="app" aria-live="polite">
+    <p class="eyebrow"><span class="dot"></span>Crashmeter · S&amp;P 500</p>
+    <div id="content"><p class="err" style="color:var(--muted)">Memuat…</p></div>
+  </main>
+
+<script>
+const ZONE = {
+  Calm:  { c:"var(--calm)",  text:"Calm Zone" },
+  Watch: { c:"var(--watch)", text:"Watch Zone" },
+  EXIT:  { c:"var(--exit)",  text:"Exit Zone" }
+};
+
+function fmtDate(iso){
+  try{
+    const d = new Date(iso);
+    return d.toLocaleString("id-ID",{day:"numeric",month:"short",year:"numeric",
+      hour:"2-digit",minute:"2-digit",timeZone:"Asia/Jakarta"}) + " WIB";
+  }catch(e){ return iso; }
+}
+
+function render(d){
+  const z = ZONE[d.zone] || ZONE.Watch;
+  document.documentElement.style.setProperty("--accent", z.c);
+
+  const segs = Array.from({length:d.max_score},(_,i)=>
+    `<div class="seg ${i < d.score ? "on":""}"></div>`).join("");
+
+  const rows = d.parameters.map(p=>`
+    <div class="row ${p.value ? "on":""}">
+      <div class="tag">${p.id}</div>
+      <div>
+        <div class="label">${p.label}</div>
+        <div class="reading">${p.reading}</div>
+      </div>
+      <div class="stat"><span class="led"></span>${p.value ? "On":"Off"}</div>
+    </div>`).join("");
+
+  document.getElementById("content").innerHTML = `
+    <section class="hero">
+      <div class="score">${d.score}<span>/${d.max_score}</span></div>
+      <div class="herometa">
+        <div class="zone">${z.text}</div>
+        <div class="segbar">${segs}</div>
+      </div>
+    </section>
+    <section class="rows">${rows}</section>
+    <footer class="foot">
+      <div class="exit">Sinyal EXIT pada skor &ge;${d.exit_threshold}.
+        ${d.exit_signal ? "Saat ini: AKTIF." : "Saat ini: belum aktif."}</div>
+      <div>Update terakhir ${fmtDate(d.updated)} ·
+        HY OAS per ${d.sources.hy_oas_as_of} ·
+        Sumber: <a href="https://fred.stlouisfed.org" target="_blank" rel="noopener">FRED</a>,
+        <a href="https://www.multpl.com/shiller-pe" target="_blank" rel="noopener">Multpl</a></div>
+      <div class="disc">Untuk edukasi. Bukan nasihat investasi.</div>
+    </footer>`;
+}
+
+fetch("data.json?ts=" + Date.now())
+  .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
+  .then(render)
+  .catch(e => {
+    document.getElementById("content").innerHTML =
+      `<p class="err">Gagal memuat data.json (${e.message}). Pastikan file ada di folder yang sama.</p>`;
+  });
+</script>
+</body>
+</html>
