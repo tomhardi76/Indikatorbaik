@@ -1,16 +1,16 @@
 {
-  "updated": "2026-06-18T08:25:00Z",
-  "score": 2,
+  "updated": "2026-06-18T08:33:16Z",
+  "score": 1,
   "max_score": 4,
-  "zone": "Watch",
+  "zone": "Calm",
   "exit_signal": false,
   "exit_threshold": 3,
   "parameters": [
     {
       "id": "A",
       "label": "Yield curve (T10Y-3M)",
-      "value": 1,
-      "reading": "Tier 2 window s/d Apr 2027"
+      "value": 0,
+      "reading": "Normal, 66 bps"
     },
     {
       "id": "B1",
