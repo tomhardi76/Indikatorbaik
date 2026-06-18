@@ -1,18 +1,38 @@
 {
-  "updated": "2026-06-18T00:00:00Z",
+  "updated": "2026-06-18T06:05:35Z",
   "score": 2,
   "max_score": 4,
   "zone": "Watch",
   "exit_signal": false,
   "exit_threshold": 3,
   "parameters": [
-    { "id": "A",  "label": "Yield curve (T10Y-3M)",        "value": 1, "reading": "Tier 2 window s/d Apr 2027" },
-    { "id": "B1", "label": "HY OAS surge \u2265150 bps / 6 bln", "value": 0, "reading": "di bawah 150 bps" },
-    { "id": "B2", "label": "HY OAS level \u2265550 bps",        "value": 0, "reading": "272 bps" },
-    { "id": "E",  "label": "Shiller CAPE \u226535",             "value": 1, "reading": "42.5" }
+    {
+      "id": "A",
+      "label": "Yield curve (T10Y-3M)",
+      "value": 1,
+      "reading": "Tier 2 window s/d Apr 2027"
+    },
+    {
+      "id": "B1",
+      "label": "HY OAS surge ≥150 bps / 6 bln",
+      "value": 0,
+      "reading": "Δ -24 bps (6 bln)"
+    },
+    {
+      "id": "B2",
+      "label": "HY OAS level ≥550 bps",
+      "value": 0,
+      "reading": "271 bps"
+    },
+    {
+      "id": "E",
+      "label": "Shiller CAPE ≥35",
+      "value": 1,
+      "reading": "41.4"
+    }
   ],
   "sources": {
-    "hy_oas_as_of": "2026-06-01",
-    "yield_curve_as_of": "2026-06-01"
+    "hy_oas_as_of": "2026-06-16",
+    "yield_curve_as_of": "2026-06-17"
   }
 }
