@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-18T23:42:36Z",
+  "updated": "2026-06-19T22:52:30Z",
   "score": 1,
   "max_score": 4,
   "zone": "Calm",
@@ -16,7 +16,7 @@
       "id": "B1",
       "label": "HY OAS surge ≥150 bps / 6 bln",
       "value": 0,
-      "reading": "Δ -32 bps (6 bln)"
+      "reading": "Δ -27 bps (6 bln)"
     },
     {
       "id": "B2",
