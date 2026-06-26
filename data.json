@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-25T23:14:08Z",
+  "updated": "2026-06-26T23:02:16Z",
   "score": 1,
   "max_score": 4,
   "zone": "Calm",
@@ -10,7 +10,7 @@
       "id": "A",
       "label": "Yield curve (T10Y-3M)",
       "value": 0,
-      "reading": "Normal, 56 bps"
+      "reading": "Normal, 55 bps"
     },
     {
       "id": "B1",
@@ -22,17 +22,17 @@
       "id": "B2",
       "label": "HY OAS level ≥550 bps",
       "value": 0,
-      "reading": "276 bps"
+      "reading": "278 bps"
     },
     {
       "id": "E",
       "label": "Shiller CAPE ≥35",
       "value": 1,
-      "reading": "41.0"
+      "reading": "40.7"
     }
   ],
   "sources": {
-    "hy_oas_as_of": "2026-06-24",
-    "yield_curve_as_of": "2026-06-25"
+    "hy_oas_as_of": "2026-06-25",
+    "yield_curve_as_of": "2026-06-26"
   }
 }
